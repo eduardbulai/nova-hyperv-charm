@@ -61,7 +61,8 @@ FunctionsToExport = @(
     "Invoke-AMQPRelationJoinedHook",
     "Invoke-MySQLDBRelationJoinedHook",
     "Invoke-WSFCRelationJoinedHook",
-    "Invoke-S2DRelationJoinedHook")
+    "Invoke-S2DRelationJoinedHook",
+    "Invoke-CSVRelationJoinedHook")
 
 # Cmdlets to export from this module
 CmdletsToExport = '*'
@@ -73,4 +74,3 @@ VariablesToExport = '*'
 AliasesToExport = '*'
 
 }
-

@@ -986,3 +986,56 @@ function Invoke-S2DRelationJoinedHook {
         Set-JujuRelation -RelationId $rid -Settings $settings
     }
 }
+
+function Invoke-CSVRelationJoinedHook {
+    $adCtxt = Get-ActiveDirectoryContext
+    if (!$adCtxt.Count) {
+        Write-JujuWarning "Delaying the CSV relation joined hook until AD context is ready"
+        return
+    }
+    $wsfcCtxt = Get-WSFCContext
+    if (!$wsfcCtxt.Count) {
+        Write-JujuWarning "Delaying the CSV relation joined hook until WSFC context is ready"
+        return
+    }
+    #$s2dCtxt = Get-S2DCtx
+    #$s2dCtxt | FT
+    #if (!$s2dCtxt.Count) {
+    #    Write-JujuWarning "Delaying the CSV relation joined hook until S2D context is ready"
+    #    return
+    #}
+
+    $rids = Get-JujuRelationIds -Relation 'csv'
+    foreach ($rid in $rids){
+        $resourcesMarshalled = Get-JujuRelation -RelationId $rid -Attribute 'resources'
+        if($resourcesMarshalled){
+            $resources = Get-UnmarshaledObject $resourcesMarshalled
+            $resources | FT
+            foreach($resource in $resources){
+                foreach ($tier in $resource.Keys)
+                {
+                    $message = "{0} has {1}" -f @($tier, $resource[$tier])
+                    Write-JujuWarning $message
+                }
+            }
+        }
+        $resultMarshalled = Get-JujuRelation -RelationId $rid -Attribute 'result'
+        $request = @{}
+        if($resultMarshalled){
+            $result = Get-UnmarshaledObject $resultMarshalled
+            $result | FT
+        }
+        $vdiskRequest = @{
+            'Performance' = '14173392076'
+            'Capacity' = '19327352832'
+        }
+        $request['request'] = Get-MarshaledObject $vdiskRequest
+        #$requestObj = Get-MarshaledObject $request
+        Set-JujuRelation -RelationId $rid -Settings $request
+        $resultMarshalled = Get-JujuRelation -RelationId $rid -Attribute 'result'
+        if($resultMarshalled){
+            $result = Get-UnmarshaledObject $resultMarshalled
+            $result | FT
+        }
+    }
+}

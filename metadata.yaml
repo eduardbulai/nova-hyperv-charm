@@ -40,3 +40,5 @@ requires:
     interface: hgs
   free-rdp:
     interface: free-rdp
+  csv:
+    interface: csv
